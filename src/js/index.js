@@ -1,55 +1,58 @@
-const API_URL = "http://localhost:3000/transactions";
-const toggleBtn = document.querySelector(".show-content-btn-toggle");
-const tableContainer = document.querySelector("#table");
-const searchInput = document.querySelector("#search-input");
+const btn = document.querySelector("#show-btn");
+const searchInput = document.querySelector(".transactions__search-box");
+const lists = document.querySelector(".transactions__lists");
+const listsContainer = document.querySelector(".transactions__table");
+const caretIcon = document.querySelectorAll(".caret-icon");
 
-toggleBtn.addEventListener("click", () => {
-  const headerContent = document.querySelector(".content-toggle");
-  const tableContent = document.querySelector(".header");
-  headerContent.classList.add("hidden");
-  tableContent.classList.remove("hidden");
+let allTransactionsData = [];
+let searchItem = "";
+let sortBy = "";
+let sortOrder = "";
+
+const httpRequestHandler = () => {
+  axios
+    .get(
+      sortBy && sortOrder
+        ? `http://localhost:3000/transactions?_sort=${sortBy}&_order=${sortOrder}&refId_like=${searchItem} `
+        : `http://localhost:3000/transactions?refId_like=${searchItem}`
+    )
+    .then((res) => {
+      allTransactionsData = res.data;
+      renderTransactions(res.data);
+    })
+    .catch((err) => console.log(err));
+};
+
+const renderTransactions = (data) => {
+  btn.classList.add("hidden");
+  searchInput.classList.remove("hidden");
+  listsContainer.classList.remove("hidden");
+  lists.innerHTML = data
+    .map(
+      (item) =>
+        `<tr>
+        <td>${item.id}</td>
+        <td class="${
+          item.type === "برداشت از حساب" ? "color-red" : "color-green"
+        }">${item.type}</td>
+        <td>${item.price}</td>
+        <td>${item.refId}</td>
+        <td>${new Date(item.date).toLocaleDateString("fa-IR")}</td>
+      </tr>`
+    )
+    .join("\n");
+};
+
+btn.addEventListener("click", httpRequestHandler);
+searchInput.addEventListener("input", (e) => {
+  searchItem = e.target.value;
+  httpRequestHandler();
 });
-
-document.addEventListener("DOMContentLoaded", init);
-function init() {
-  Transactions.getTransactions();
-}
-
-class Transactions {
-  constructor(transaction) {
-    this.id = transaction.id;
-    this.type = transaction.type;
-    this.price = transaction.price;
-    this.refId = transaction.refId;
-    this.date = transaction.date;
-  }
-  static getTransactions() {
-    fetch(API_URL)
-      .then((res) => res.json())
-      .then((transactionArr) => {
-        searchInput.addEventListener("input", (e) => {
-          this.refId = e.target.value;
-        });
-        this.renderTransactions(transactionArr);
-      });
-  }
-  static renderTransactions(data) {
-    let result = `<tr>
-    <th>ردیف</th>
-    <th>نوع تراکنش</th>
-    <th>مبلغ</th>
-    <th>شماره پیگیری</th>
-    <th>تاریخ تراکنش</th>
-  </tr>`;
-    data.forEach((item) => {
-      result += `<tr>
-            <th>${item.id}</th>
-            <th>${item.type}</th>
-            <th>${item.price}</th>
-            <th>${item.refId}</th>
-            <th>${item.date}</th>
-          </tr>`;
-    });
-    tableContainer.innerHTML = result;
-  }
-}
+caretIcon.forEach((icon) => {
+  icon.addEventListener("click", (e) => {
+    e.target.classList.toggle("rotate-up");
+    sortBy = e.target.dataset.type;
+    sortOrder = e.target.classList.contains("rotate-up") ? "desc" : "asc";
+    httpRequestHandler();
+  });
+});
