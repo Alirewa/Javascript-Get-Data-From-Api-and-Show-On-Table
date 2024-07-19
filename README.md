@@ -1,5 +1,5 @@
-After Clone this project you need install packages in terminal:
-npm install
+After Clone this project you need install packages in terminal: <br/>
+npm install  <br/>
 npm run server
 
 
