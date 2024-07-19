@@ -1,4 +1,9 @@
+After Clone this project you need install packages in terminal:
+npm install
+npm run server
+
+
 Preview Of This Project:
 
-![image](https://github.com/user-attachments/assets/197db602-28cd-47b8-99a4-f08fa97fec95)
-![image](https://github.com/user-attachments/assets/d98682e0-16f2-4310-b47a-b768586e26bf)
+![image](https://github.com/user-attachments/assets/bc0a4ee1-7ddf-416f-a83a-bc98e9fd54b4)
+![image](https://github.com/user-attachments/assets/fe17233a-5d0b-462d-9881-6d464217a90f)
